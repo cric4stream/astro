@@ -3,46 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plyr Video Player with URL Parameters</title>
+  <title>Debugging HLS Video</title>
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-  </style>
 </head>
 <body>
-  <h1>Plyr HLS Video Player</h1>
+  <h1>Debug HLS Player</h1>
   <video id="player" controls></video>
 
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
   <script>
-    // Function to get URL parameters
-    function getURLParameter(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name);
-    }
-
-    // Get video URL from URL parameters
-    let videoSrc = getURLParameter('video');
-
-    // Debugging: Log the video URL
-    console.log('Video Source:', videoSrc);
-
-    // Check if videoSrc is provided, else set a default value
-    if (!videoSrc) {
-      alert('No video URL provided. Using a default video.');
-      videoSrc = 'https://criccoder.pages.dev/astro.m3u8'; // Default fallback
-    }
-
-    // Optional: Use a proxy for testing if CORS issues exist
-    // Uncomment the next line if needed
-    // videoSrc = 'https://cors-anywhere.herokuapp.com/' + videoSrc;
-
     const video = document.getElementById('player');
+    let videoSrc = 'https://criccoder.pages.dev/astro.m3u8';
+
+    // Use a proxy if needed
+    // videoSrc = 'https://cors-anywhere.herokuapp.com/' + videoSrc;
 
     if (Hls.isSupported()) {
       const hls = new Hls();
@@ -50,6 +25,7 @@
       hls.attachMedia(video);
 
       hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        console.log('HLS manifest loaded.');
         video.play();
       });
 
@@ -58,7 +34,6 @@
         alert('Error loading video: ' + data.details);
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // For Safari (native HLS support)
       video.src = videoSrc;
       video.addEventListener('loadedmetadata', function () {
         video.play();
@@ -66,20 +41,6 @@
     } else {
       alert('Your browser does not support HLS streaming.');
     }
-
-    // Initialize Plyr
-    const player = new Plyr(video, {
-      controls: [
-        'play-large', // The large play button in the center
-        'play',       // Play/pause playback
-        'progress',   // The progress bar and scrubber
-        'current-time', // The current time of playback
-        'mute',       // Mute/unmute
-        'volume',     // Volume control
-        'settings',   // Settings menu
-        'fullscreen'  // Fullscreen toggle
-      ]
-    });
   </script>
 </body>
 </html>
