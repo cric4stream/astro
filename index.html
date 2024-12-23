@@ -27,7 +27,20 @@
     }
 
     // Get video URL from URL parameters
-    const videoSrc = getURLParameter('video') || 'https://criccoder.pages.dev/astro.m3u8';
+    let videoSrc = getURLParameter('video');
+
+    // Debugging: Log the video URL
+    console.log('Video Source:', videoSrc);
+
+    // Check if videoSrc is provided, else set a default value
+    if (!videoSrc) {
+      alert('No video URL provided. Using a default video.');
+      videoSrc = 'https://criccoder.pages.dev/astro.m3u8'; // Default fallback
+    }
+
+    // Optional: Use a proxy for testing if CORS issues exist
+    // Uncomment the next line if needed
+    // videoSrc = 'https://cors-anywhere.herokuapp.com/' + videoSrc;
 
     const video = document.getElementById('player');
 
@@ -35,8 +48,14 @@
       const hls = new Hls();
       hls.loadSource(videoSrc);
       hls.attachMedia(video);
+
       hls.on(Hls.Events.MANIFEST_PARSED, function () {
         video.play();
+      });
+
+      hls.on(Hls.Events.ERROR, function (event, data) {
+        console.error('HLS.js Error:', data);
+        alert('Error loading video: ' + data.details);
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // For Safari (native HLS support)
